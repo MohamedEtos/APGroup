@@ -13,6 +13,15 @@ return new class extends Migration
     {
         Schema::create('tables', function (Blueprint $table) {
             $table->id();
+            $table->string('invoice');
+            $table->string('code');
+            $table->string('img')->nullable();
+            $table->string('sender');
+            $table->string('receiver');
+            $table->integer('qty');
+            $table->decimal('price', 10, 2)->default(0);
+            $table->string('type');
+            $table->date('date');
             $table->timestamps();
         });
     }
