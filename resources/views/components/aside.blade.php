@@ -47,7 +47,7 @@
                 </g>
               </svg>
             </div>
-            <span class="nav-link-text me-1">الجداول</span>
+            <span class="nav-link-text me-1">الفواتير
           </a>
         </li>
         <li class="nav-item">
