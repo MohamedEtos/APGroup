@@ -257,10 +257,6 @@
       </div>
     </div>
 
-    @php
-      $subtotal = $invoice->items->sum(fn($i) => $i->qty * $i->price);
-    @endphp
-
     {{-- Items Table --}}
     <table class="invoice-table">
       <thead>
@@ -269,10 +265,9 @@
           <th>كود التوب</th>
           <th style="text-align: center;">النوع</th>
           <th style="text-align: center;">لون القماش</th>
-          <th style="text-align: center;">الكمية</th>
+          <th style="text-align: center;">العدد</th>
           <th style="text-align: center;">الوحدة</th>
-          <th style="text-align: left;">سعر الوحدة</th>
-          <th style="text-align: left;">الإجمالي</th>
+          <th style="text-align: center;">الإجمالي بالكيلو</th>
         </tr>
       </thead>
       <tbody>
@@ -291,8 +286,7 @@
             </td>
             <td style="text-align: center;">{{ number_format($item->qty, 3) }}</td>
             <td style="text-align: center;"><span class="unit-badge">{{ $item->unit }}</span></td>
-            <td style="text-align: left;">{{ number_format($item->price, 2) }} ج.م</td>
-            <td style="text-align: left; font-weight: 700; color: #2b3553;">{{ number_format($item->qty * $item->price, 2) }} ج.م</td>
+            <td style="text-align: center; font-weight: 700; color: #2b3553;">{{ number_format($item->total_kg, 3) }} كيلو</td>
           </tr>
         @empty
           <tr>
@@ -302,19 +296,11 @@
       </tbody>
     </table>
 
-    {{-- Totals --}}
+    {{-- Total KG box --}}
     <div class="totals-box">
-      <div class="total-row">
-        <span>الإجمالي الفرعي:</span>
-        <span>{{ number_format($subtotal, 2) }} ج.م</span>
-      </div>
-      <div class="total-row">
-        <span>الضريبة (0%):</span>
-        <span>0.00 ج.م</span>
-      </div>
       <div class="total-row grand-total">
-        <span>الإجمالي الكلي:</span>
-        <span>{{ number_format($subtotal, 2) }} ج.م</span>
+        <span>إجمالي الكيلو:</span>
+        <span>{{ number_format($invoice->items->sum('total_kg'), 3) }} كيلو</span>
       </div>
     </div>
 

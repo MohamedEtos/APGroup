@@ -25,13 +25,11 @@ class Invoice extends Model
     }
 
     /**
-     * حساب الإجمالي الكلي للفاتورة
+     * إجمالي الكيلو للفاتورة كلها
      */
-    public function getTotalAttribute()
+    public function getTotalKgAttribute()
     {
-        return $this->items->sum(function ($item) {
-            return $item->qty * $item->price;
-        });
+        return $this->items->sum('total_kg');
     }
 
     /**

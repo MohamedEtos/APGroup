@@ -2,6 +2,74 @@
 
 @section('content')
 
+{{-- ===== Image Modal ===== --}}
+<div id="imgModal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.82); align-items:center; justify-content:center;" onclick="closeImgModal()">
+  <div style="position:relative; max-width:90vw; max-height:90vh;" onclick="event.stopPropagation()">
+    <button onclick="closeImgModal()" style="position:absolute; top:-14px; right:-14px; width:32px; height:32px; border-radius:50%; background:#fff; border:none; font-size:18px; line-height:1; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.3); z-index:1;">&times;</button>
+    <img id="modalImg" src="" alt="صورة الفاتورة"
+         style="max-width:88vw; max-height:88vh; border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,.5); display:block;">
+    <p id="modalCaption" style="text-align:center; color:#fff; margin-top:10px; font-size:13px; opacity:.8;"></p>
+  </div>
+</div>
+
+<style>
+  #imgModal.open { display:flex !important; }
+
+  .img-thumb {
+    width: 38px; height: 38px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.15);
+    cursor: zoom-in;
+    transition: transform .18s ease, box-shadow .18s ease;
+    border: 2px solid #e9ecef;
+  }
+  .img-thumb:hover { transform: scale(1.14); box-shadow: 0 4px 14px rgba(0,0,0,.22); }
+
+  .img-placeholder {
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    border: 2px dashed #ccc;
+    color: #bbb;
+    font-size: 15px;
+    transition: all .18s ease;
+  }
+  .img-placeholder:hover { border-color: #cb0c9f; color: #cb0c9f; transform: scale(1.1); }
+
+  /* Expandable items row */
+  .invoice-detail-row { display: none; background: #f8f9fa; }
+  .invoice-detail-row.open { display: table-row; }
+
+  tr.invoice-main-row { cursor: pointer; user-select: none; }
+  tr.invoice-main-row:hover td { background-color: rgba(203,12,159,.04); }
+
+  .toggle-chevron {
+    display: inline-block;
+    transition: transform .22s ease;
+    font-size: 0.65rem;
+    color: #8392ab;
+    margin-left: 5px;
+  }
+  .toggle-chevron.open { transform: rotate(90deg); }
+
+  .detail-inner-table th {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    color: #8392ab;
+    padding: 6px 10px;
+  }
+  .detail-inner-table td {
+    font-size: 0.8rem;
+    padding: 7px 10px;
+    border-bottom: 1px solid #ececec;
+  }
+  .detail-inner-table tr:last-child td { border-bottom: none; }
+</style>
+
 <div class="container-fluid py-4">
   <div class="row">
     <div class="col-12">
@@ -9,30 +77,23 @@
 
         {{-- Card Header --}}
         <div class="card-header pb-0 d-flex justify-content-between align-items-center flex-wrap gap-3">
-          <h6 class="mb-0">جدول الفواتير</h6>
-          <div class="d-flex align-items-center gap-2 flex-wrap ">
-            {{-- Rows per page --}}
-            <div class="d-flex align-items-center gap-1 ">
-                <label for="rowsPerPage" class="text-xs text-secondary mb-0 text-nowrap">عدد الصفوف:</label>
-                <select dir="ltr" id="rowsPerPage" class="form-select " style="width:120px;" onchange="changeRowsPerPage()">
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option selected value="25">25</option>
-                  <option value="50">50</option>
-                  <option value="all">الكل</option>
-                </select>
-                  {{-- Live Search --}}
-              <div class="input-group" style="min-width:220px;">
- 
-                <input
-                  type="text"
-                  id="liveSearchInput"
-                  class="form-control border-start-0 ps-0"
-                  placeholder="بحث لحظي..."
-                  oninput="filterTable()"
-                >
-              </div>
-            </div>
+          <div>
+            <h6 class="mb-0">جدول الفواتير</h6>
+            <p class="text-xs text-secondary mb-0">اضغط على أي صف لعرض تفاصيل الأصناف</p>
+          </div>
+          <div class="d-flex align-items-center gap-2 flex-nowrap">
+            <label for="rowsPerPage" class="text-xs text-secondary mb-0 text-nowrap">عدد الصفوف:</label>
+            <select dir="ltr" id="rowsPerPage" class="form-select form-select-sm" style="width:70px;" onchange="changeRowsPerPage()">
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option selected value="25">25</option>
+              <option value="50">50</option>
+              <option value="all">الكل</option>
+            </select>
+            <input type="text" id="liveSearchInput" class="form-control form-control-sm" style="width:160px;" placeholder="بحث..." oninput="filterTable()">
+            <a href="{{ route('office-invoices.index') }}" class="btn btn-sm bg-gradient-primary mb-0 text-nowrap">
+              <i class="fas fa-plus me-1"></i> فاتورة جديدة
+            </a>
           </div>
         </div>
 
@@ -42,16 +103,16 @@
             <table class="table align-items-center mb-0" id="invoicesTable">
               <thead>
                 <tr>
-                  <th class=" font-weight-bolder  text-end pe-3">#id</th>
-                  <th class=" font-weight-bolder  text-end pe-3">رقم الفاتورة</th>
-                  <th class=" font-weight-bolder  text-end pe-3">كود التوب</th>
-                  <th class=" font-weight-bolder  text-center">صورة</th>
-                  <th class=" font-weight-bolder  text-end pe-3">المسلم</th>
-                  <th class=" font-weight-bolder  text-end pe-3">المستلم</th>
-                  <th class=" font-weight-bolder  text-center">الكمية</th>
-                  <th class=" font-weight-bolder  text-center">النوع</th>
-                  <th class=" font-weight-bolder  text-center">التاريخ</th>
-                  <th class="  text-center">تحكم</th>
+                  <th class="font-weight-bolder" style="width:30px;"></th>
+                  <th class="font-weight-bolder text-end pe-3">#</th>
+                  <th class="font-weight-bolder text-end pe-3">رقم الفاتورة</th>
+                  <th class="font-weight-bolder text-center">صورة</th>
+                  <th class="font-weight-bolder text-end pe-3">المسلم</th>
+                  <th class="font-weight-bolder text-end pe-3">المستلم</th>
+                  <th class="font-weight-bolder text-center">إجمالي العدد</th>
+                  <th class="font-weight-bolder text-center">إجمالي الكيلو</th>
+                  <th class="font-weight-bolder text-center">التاريخ</th>
+                  <th class="text-center">تحكم</th>
                 </tr>
               </thead>
               <tbody id="tableBody">
@@ -90,35 +151,52 @@
 </div>
 
 <script>
-// ======================================================
-// Dummy Data — استبدلها ببيانات من Backend عند الجاهزية
-// ======================================================
-const allData = [
-  { id: 1,  invoice: 'INV-1001', code: 'TOP-A1', img: '{{ asset("assets/img/team-2.jpg") }}', sender: 'أحمد علي',     receiver: 'محمد سامي',   qty: 10, type: 'طباعة',   date: '2024-01-15' },
-  { id: 2,  invoice: 'INV-1002', code: 'TOP-B2', img: '{{ asset("assets/img/team-3.jpg") }}', sender: 'سارة حسن',     receiver: 'خالد منصور',  qty: 5,  type: 'ليزر',    date: '2024-01-18' },
-  { id: 3,  invoice: 'INV-1003', code: 'TOP-C3', img: '{{ asset("assets/img/team-4.jpg") }}', sender: 'عمر إبراهيم',  receiver: 'نادية كمال',  qty: 20, type: 'رول بريس', date: '2024-02-01' },
-  { id: 4,  invoice: 'INV-1004', code: 'TOP-D4', img: '{{ asset("assets/img/team-2.jpg") }}', sender: 'فاطمة محمود',  receiver: 'يوسف أحمد',  qty: 8,  type: 'طباعة',   date: '2024-02-10' },
-  { id: 5,  invoice: 'INV-1005', code: 'TOP-E5', img: '{{ asset("assets/img/team-3.jpg") }}', sender: 'كريم عبدالله', receiver: 'ريم فاروق',  qty: 15, type: 'ليزر',    date: '2024-02-14' },
-  { id: 6,  invoice: 'INV-1006', code: 'TOP-F6', img: '{{ asset("assets/img/team-4.jpg") }}', sender: 'منى صالح',     receiver: 'تامر عيسى',  qty: 3,  type: 'ستراس',   date: '2024-03-05' },
-  { id: 7,  invoice: 'INV-1007', code: 'TOP-G7', img: '{{ asset("assets/img/team-2.jpg") }}', sender: 'علي حمدي',     receiver: 'شيماء نبيل', qty: 25, type: 'طباعة',   date: '2024-03-12' },
-  { id: 8,  invoice: 'INV-1008', code: 'TOP-H8', img: '{{ asset("assets/img/team-3.jpg") }}', sender: 'نور الدين',    receiver: 'إيمان رضا',  qty: 7,  type: 'رول بريس', date: '2024-03-20' },
-  { id: 9,  invoice: 'INV-1009', code: 'TOP-I9', img: '{{ asset("assets/img/team-4.jpg") }}', sender: 'حسام فتحي',   receiver: 'دينا حسين',  qty: 12, type: 'ليزر',    date: '2024-04-02' },
-  { id: 10, invoice: 'INV-1010', code: 'TOP-J10',img: '{{ asset("assets/img/team-2.jpg") }}', sender: 'إسلام بدر',   receiver: 'مروة طه',    qty: 30, type: 'ستراس',   date: '2024-04-09' },
-  { id: 11, invoice: 'INV-1011', code: 'TOP-K11',img: '{{ asset("assets/img/team-3.jpg") }}', sender: 'أسماء جمال',  receiver: 'وليد سعد',   qty: 9,  type: 'طباعة',   date: '2024-04-15' },
-  { id: 12, invoice: 'INV-1012', code: 'TOP-L12',img: '{{ asset("assets/img/team-4.jpg") }}', sender: 'باسم ناجي',   receiver: 'غادة عمر',   qty: 18, type: 'ليزر',    date: '2024-05-01' },
-];
+const allData = @json($invoices);
+
+const PLACEHOLDER_SVG = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect width='80' height='80' rx='10' fill='%23f0f0f0'/><text x='50%25' y='52%25' dominant-baseline='middle' text-anchor='middle' font-size='28' fill='%23bbb'>&#128247;</text></svg>`;
 
 let ROWS_PER_PAGE = 25;
 let currentPage   = 1;
 let filteredData  = [...allData];
 
-// ---- Colour badge per type
-const typeBadge = {
-  'طباعة'   : 'bg-gradient-primary',
-  'ليزر'    : 'bg-gradient-info',
-  'رول بريس': 'bg-gradient-warning',
-  'ستراس'   : 'bg-gradient-success',
-};
+// ---- Image Modal
+function openImgModal(src, caption) {
+  document.getElementById('modalImg').src = src;
+  document.getElementById('modalCaption').textContent = caption || '';
+  document.getElementById('imgModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeImgModal() {
+  document.getElementById('imgModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeImgModal(); });
+
+function imgCell(imgPath, caption) {
+  const isDefault = !imgPath || imgPath === 'assets/img/team-2.jpg';
+  if (isDefault) {
+    return `<span class="img-placeholder" onclick="event.stopPropagation();openImgModal('${PLACEHOLDER_SVG}','لا توجد صورة')" title="لا توجد صورة"><i class="fas fa-image"></i></span>`;
+  }
+  const src = '/' + imgPath;
+  return `<img src="${src}" class="img-thumb" alt="صورة"
+    onclick="event.stopPropagation();openImgModal(this.src,'${caption}')"
+    onerror="this.outerHTML='<span class=\\'img-placeholder\\' onclick=\\'event.stopPropagation();openImgModal(PLACEHOLDER_SVG,\\'لا توجد صورة\\')\\'><i class=\\'fas fa-image\\'></i></span>'"
+    title="اضغط للتكبير">`;
+}
+
+function colorDot(color) {
+  if (!color) return '—';
+  return `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${color};border:1px solid #ccc;vertical-align:middle;margin-left:3px;"></span> ${color}`;
+}
+
+// ---- Toggle detail row
+function toggleDetail(id) {
+  const detailRow = document.getElementById('detail-' + id);
+  const chevron   = document.getElementById('chev-' + id);
+  if (!detailRow) return;
+  detailRow.classList.toggle('open');
+  chevron.classList.toggle('open');
+}
 
 function changeRowsPerPage() {
   const val = document.getElementById('rowsPerPage').value;
@@ -130,10 +208,41 @@ function changeRowsPerPage() {
 function filterTable() {
   const q = document.getElementById('liveSearchInput').value.trim().toLowerCase();
   filteredData = allData.filter(r =>
-    Object.values(r).some(v => String(v).toLowerCase().includes(q))
+    [r.invoice_number, r.sender, r.receiver, r.date,
+     ...(r.items || []).flatMap(i => [i.code, i.type])
+    ].some(v => String(v || '').toLowerCase().includes(q))
   );
   currentPage = 1;
   renderTable();
+}
+
+function buildItemsTable(items) {
+  if (!items || items.length === 0)
+    return `<p class="text-xs text-secondary mb-0 p-2">لا توجد أصناف في هذه الفاتورة.</p>`;
+
+  const rows = items.map((item, idx) => `
+    <tr>
+      <td>${idx + 1}</td>
+      <td><strong>${item.code}</strong></td>
+      <td>${item.type}</td>
+      <td>${colorDot(item.fabric_color)}</td>
+      <td class="text-center">${parseFloat(item.qty).toFixed(3)}</td>
+      <td class="text-center"><span class="">${item.unit}</span></td>
+      <td class="text-center font-weight-bold text-primary">${parseFloat(item.total_kg).toFixed(3)} كيلو</td>
+    </tr>
+  `).join('');
+
+  return `
+    <table class="table table-sm mb-0 detail-inner-table">
+      <thead>
+        <tr>
+          <th>#</th><th>الكود</th><th>النوع</th><th>اللون</th>
+          <th class="text-center">العدد</th><th class="text-center">الوحدة</th>
+          <th class="text-center">الإجمالي كيلو</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
 }
 
 function renderTable() {
@@ -144,70 +253,64 @@ function renderTable() {
   const total  = filteredData.length;
   const pages  = Math.ceil(total / ROWS_PER_PAGE) || 1;
 
-  // ---- Rows
   const tbody = document.getElementById('tableBody');
   if (page.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-secondary">لا توجد نتائج</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="10" class="text-center py-5 text-secondary">
+      <i class="fas fa-inbox fa-2x mb-2 d-block opacity-4"></i>لا توجد فواتير مسجلة بعد.<br>
+      <a href="{{ route('office-invoices.index') }}" class="btn btn-sm bg-gradient-primary mt-3">إضافة فاتورة</a>
+    </td></tr>`;
   } else {
-    tbody.innerHTML = page.map(r => `
-      <tr>
-        <td class="text-end pe-3">
-          <span class="text-xs font-weight-bold">${r.id}</span>
-        </td>
-        <td class="text-end pe-3">
-          <span class="text-xs font-weight-bold text-primary">${r.invoice}</span>
-        </td>
-        <td class="text-end pe-3">
-          <span class="">${r.code}</span>
-        </td>
-        <td class="text-center">
-          <img src="${r.img}" class="avatar avatar-sm border-radius-md shadow" alt="img" style="object-fit:cover;">
-        </td>
-        <td class="text-end pe-3">
-          <span class="text-xs font-weight-bold">${r.sender}</span>
-        </td>
-        <td class="text-end pe-3">
-          <span class="text-xs font-weight-bold">${r.receiver}</span>
-        </td>
-        <td class="text-center">
-          <span class="badge badge-sm bg-gradient-secondary">${r.qty}</span>
-        </td>
-        <td class="text-center">
-          <span class="">${r.type}</span>
-        </td>
-        <td class="text-center">
-          <span class="text-xs text-secondary font-weight-bold">${r.date}</span>
-        </td>
-        <td class="text-center">
-          <button class="btn btn-sm btn-outline-info mb-0 me-1 py-1 px-2" title="عرض" onclick="alert('عرض #${r.id}')">
-            <i class="fas fa-eye fa-xs"></i>
-          </button>
-          <button class="btn btn-sm btn-outline-warning mb-0 me-1 py-1 px-2" title="تعديل" onclick="alert('تعديل #${r.id}')">
-            <i class="fas fa-edit fa-xs"></i>
-          </button>
-          <button class="btn btn-sm btn-outline-danger mb-0 py-1 px-2" title="حذف" onclick="confirmDelete(${r.id})">
-            <i class="fas fa-trash fa-xs"></i>
-          </button>
-        </td>
-      </tr>
-    `).join('');
+    let html = '';
+    page.forEach((r, i) => {
+      const itemCount = r.items ? r.items.length : 0;
+      html += `
+        <tr class="invoice-main-row" onclick="toggleDetail(${r.id})">
+          <td class="text-center ps-3">
+            <i class="fas fa-chevron-left toggle-chevron" id="chev-${r.id}"></i>
+          </td>
+          <td class="text-end pe-3"><span class="text-xs font-weight-bold">${start + i + 1}</span></td>
+          <td class="text-end pe-3">
+            <span class="text-xs font-weight-bold text-primary">${r.invoice_number}</span>
+            <br><span class="text-xs text-secondary">${itemCount} صنف</span>
+          </td>
+          <td class="text-center py-2">${imgCell(r.img, r.invoice_number)}</td>
+          <td class="text-end pe-3"><span class="text-xs font-weight-bold">${r.sender}</span></td>
+          <td class="text-end pe-3"><span class="text-xs font-weight-bold">${r.receiver}</span></td>
+          <td class="text-center"><span class="">${parseFloat(r.total_qty).toFixed(3)}</span></td>
+          <td class="text-center"><span class="text-xs font-weight-bold text-primary">${parseFloat(r.total_kg).toFixed(3)} كيلو</span></td>
+          <td class="text-center"><span class="text-xs text-secondary font-weight-bold">${r.date}</span></td>
+          <td class="text-center" onclick="event.stopPropagation()">
+            <a href="/invoice-receipt/${r.id}" target="_blank" class="btn btn-sm btn-outline-info mb-0 py-1 px-2" title="عرض / طباعة">
+              <i class="fas fa-print fa-xs"></i>
+            </a>
+          </td>
+        </tr>
+        <tr class="invoice-detail-row" id="detail-${r.id}">
+          <td colspan="10" class="p-0">
+            <div class="px-4 py-3">
+              <small class="text-secondary font-weight-bold text-xs mb-2 d-block">
+                <i class="fas fa-list-ul me-1"></i> تفاصيل الأصناف (${itemCount} صنف)
+              </small>
+              ${buildItemsTable(r.items)}
+            </div>
+          </td>
+        </tr>
+      `;
+    });
+    tbody.innerHTML = html;
   }
 
-  // ---- Info text
   document.getElementById('paginationInfo').textContent =
-    `عرض ${Math.min(start + 1, total)} - ${Math.min(end, total)} من ${total} سجل`;
+    `عرض ${Math.min(start + 1, total)} - ${Math.min(end, total)} من ${total} فاتورة`;
 
-  // ---- Pagination buttons
   const ul = document.getElementById('paginationControls');
   ul.innerHTML = '';
 
-  // Prev
   const prev = document.createElement('li');
   prev.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
   prev.innerHTML = `<a class="page-link" href="javascript:;" onclick="goToPage(${currentPage - 1})">&#8249;</a>`;
   ul.appendChild(prev);
 
-  // Pages
   for (let p = 1; p <= pages; p++) {
     const li = document.createElement('li');
     li.className = `page-item ${p === currentPage ? 'active' : ''}`;
@@ -215,7 +318,6 @@ function renderTable() {
     ul.appendChild(li);
   }
 
-  // Next
   const next = document.createElement('li');
   next.className = `page-item ${currentPage === pages ? 'disabled' : ''}`;
   next.innerHTML = `<a class="page-link" href="javascript:;" onclick="goToPage(${currentPage + 1})">&#8250;</a>`;
@@ -229,13 +331,6 @@ function goToPage(p) {
   renderTable();
 }
 
-function confirmDelete(id) {
-  if (confirm(`هل أنت متأكد من حذف السجل رقم ${id}؟`)) {
-    alert(`تم حذف السجل رقم ${id}`);
-  }
-}
-
-// Initial render
 renderTable();
 </script>
 

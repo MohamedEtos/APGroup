@@ -27,11 +27,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('invoice_id')->constrained('invoices')->onDelete('cascade');
             $table->string('code');
-            $table->string('type');         // نوع كتابي (نص حر)
-            $table->string('fabric_color')->nullable(); // لون القماش
-            $table->decimal('qty', 10, 3);  // الكمية (تدعم أعداد عشرية للكيلو/المتر)
-            $table->string('unit')->default('كيلو'); // الوحدة: كيلو / متر / قطعة
-            $table->decimal('price', 10, 2)->default(0);
+            $table->string('type');         
+            $table->string('fabric_color')->nullable(); 
+            $table->decimal('qty', 10, 3);  
+            $table->string('unit')->default('كيلو'); 
+            $table->decimal('total_kg', 10, 3)->default(0); // الإجمالي بالكيلو (يُدخل يدوياً)
             $table->timestamps();
         });
     }

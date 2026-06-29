@@ -15,7 +15,7 @@ class InvoiceItem extends Model
         'fabric_color',
         'qty',
         'unit',
-        'price',
+        'total_kg',
     ];
 
     /**
@@ -24,13 +24,5 @@ class InvoiceItem extends Model
     public function invoice()
     {
         return $this->belongsTo(Invoice::class, 'invoice_id');
-    }
-
-    /**
-     * إجمالي سطر الفاتورة
-     */
-    public function getSubtotalAttribute()
-    {
-        return $this->qty * $this->price;
     }
 }

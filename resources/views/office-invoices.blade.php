@@ -172,7 +172,7 @@
             <div class="d-flex justify-content-between align-items-center">
               <div>
                 <h6 class="mb-0">إنشاء فاتورة مكتب جديدة</h6>
-                <p class="text-xs text-secondary mb-0">أدخل تفاصيل الفاتورة وأضف الأصناف لحساب الإجماليات تلقائياً</p>
+                <p class="text-xs text-secondary mb-0">أدخل تفاصيل الفاتورة وأضف الأصناف مع العدد والإجمالي بالكيلو</p>
               </div>
               <div class="logo-container align-self-start">
                 <span class="font-weight-bold">ApGroup المكتب الرئيسي</span>
@@ -202,10 +202,43 @@
                 </div>
 
                 <div class="col-md-4 col-12 mb-3">
-                  <label for="img" class="form-label text-xs font-weight-bold text-secondary">صورة الفاتورة
-                    (اختياري)</label>
-                  <input type="file" class="form-control form-control-sm @error('img') is-invalid @enderror" id="img"
-                    name="img" accept="image/*">
+                  <label class="form-label text-xs font-weight-bold text-secondary">صورة الفاتورة (اختياري)</label>
+
+                  {{-- Hidden input to send compressed WebP --}}
+                  <input type="hidden" name="img_base64" id="img_base64">
+
+                  {{-- Visible file picker --}}
+                  <input type="file" class="form-control form-control-sm @error('img') is-invalid @enderror"
+                    id="imgPicker" accept="image/*" onchange="handleImageSelect(this)">
+
+                  {{-- Quality slider --}}
+                  <div id="qualityRow" class="mt-2 d-none">
+                    <div class="d-flex align-items-center gap-2">
+                      <label class="text-xs text-secondary mb-0 text-nowrap">جودة:</label>
+                      <input type="range" id="qualitySlider" min="10" max="95" value="72"
+                             class="form-range" style="flex:1;" oninput="updateQualityLabel();recompress()">
+                      <span id="qualityLabel" class="text-xs font-weight-bold" style="width:32px;">72%</span>
+                    </div>
+                  </div>
+
+                  {{-- Preview + stats --}}
+                  <div id="imgPreviewBox" class="mt-2 d-none">
+                    <div class="d-flex gap-3 align-items-start">
+                      <img id="imgPreview" src="" alt="معاينة"
+                           style="width:72px;height:72px;object-fit:cover;border-radius:8px;
+                                  border:2px solid #e9ecef;box-shadow:0 2px 6px rgba(0,0,0,.1);cursor:zoom-in;"
+                           onclick="openPreviewModal()">
+                      <div style="font-size:0.75rem;line-height:1.7;">
+                        <div><span class="text-secondary">الأصلي:</span> <strong id="sizeOriginal">—</strong></div>
+                        <div><span class="text-secondary">بعد الضغط:</span> <strong id="sizeCompressed" class="text-success">—</strong></div>
+                        <div><span class="text-secondary">التوفير:</span> <strong id="sizeSaved" class="text-primary">—</strong></div>
+                        <div class="text-muted" style="font-size:0.68rem;">WebP · أسرع تحميل</div>
+                      </div>
+                    </div>
+                    <button type="button" class="btn btn-link text-danger p-0 mt-1 text-xs" onclick="removeImage()">
+                      <i class="far fa-trash-alt me-1"></i> إزالة الصورة
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -218,9 +251,8 @@
                       <th class="font-weight-bolder" style="min-width: 110px;">كود التوب</th>
                       <th class="font-weight-bolder" style="min-width: 120px;">النوع</th>
                       <th class="font-weight-bolder" style="min-width: 130px;">لون القماش</th>
-                      <th class="text-center font-weight-bolder" style="min-width: 180px;">الكمية والوحدة</th>
-                      <th class="text-center font-weight-bolder" style="min-width: 100px;">سعر الوحدة</th>
-                      <th class="text-center font-weight-bolder" style="min-width: 90px;">الإجمالي</th>
+                      <th class="text-center font-weight-bolder" style="min-width: 180px;">العدد والوحدة</th>
+                      <th class="text-center font-weight-bolder" style="min-width: 120px;">الإجمالي </th>
                       <th class="text-center font-weight-bolder" style="width: 5%;">حذف</th>
                     </tr>
                   </thead>
@@ -237,18 +269,18 @@
                 </button>
               </div>
 
-              {{-- Totals Summary & Submit Button --}}
+              {{-- Summary & Submit Button --}}
               <div class="row mt-4 align-items-center">
                 <div class="col-lg-6 col-12 mb-3 mb-lg-0">
                   <div class="invoice-summary-box p-3 d-flex justify-content-around text-center">
                     <div>
-                      <span class="text-xs text-secondary font-weight-bold d-block">إجمالي الكميات</span>
+                      <span class="text-xs text-secondary font-weight-bold d-block">إجمالي العدد</span>
                       <span class="text-lg font-weight-bold text-dark" id="total-qty">0</span>
                     </div>
                     <div class="vr bg-secondary opacity-25"></div>
                     <div>
-                      <span class="text-xs text-secondary font-weight-bold d-block">الإجمالي الكلي</span>
-                      <span class="text-lg font-weight-bold text-success"><span id="grand-total">0.00</span> ج.م</span>
+                      <span class="text-xs text-secondary font-weight-bold d-block">إجمالي الكيلو</span>
+                      <span class="text-lg font-weight-bold text-primary"><span id="grand-total-kg">0.000</span> كيلو</span>
                     </div>
                   </div>
                 </div>
@@ -282,8 +314,8 @@
                     <th class="font-weight-bolder text-end pe-3">#id</th>
                     <th class="font-weight-bolder text-end pe-3">رقم الفاتورة</th>
                     <th class="font-weight-bolder text-end pe-3">اسم العميل</th>
-                    <th class="font-weight-bolder text-center">إجمالي الكمية</th>
-                    <th class="font-weight-bolder text-center">الإجمالي الكلي</th>
+                    <th class="font-weight-bolder text-center">إجمالي العدد</th>
+                    <th class="font-weight-bolder text-center">إجمالي الكيلو</th>
                     <th class="font-weight-bolder text-center">التاريخ</th>
                     <th class="font-weight-bolder text-center">الإجراءات</th>
                   </tr>
@@ -306,7 +338,7 @@
                         <span class="text-xs font-weight-bold">{{ number_format($invoice->total_qty, 3) }}</span>
                       </td>
                       <td class="text-center">
-                        <span class="text-xs font-weight-bold text-success">{{ number_format($invoice->total, 2) }} ج.م</span>
+                        <span class="text-xs font-weight-bold text-primary">{{ number_format($invoice->total_kg, 3) }} كيلو</span>
                       </td>
                       <td class="text-center">
                         <span class="text-xs text-secondary font-weight-bold">{{ $invoice->date }}</span>
@@ -334,10 +366,9 @@
                                   <th class="text-xs text-secondary">الكود</th>
                                   <th class="text-xs text-secondary">النوع</th>
                                   <th class="text-xs text-secondary">لون القماش</th>
-                                  <th class="text-xs text-secondary text-center">الكمية</th>
+                                  <th class="text-xs text-secondary text-center">العدد</th>
                                   <th class="text-xs text-secondary text-center">الوحدة</th>
-                                  <th class="text-xs text-secondary text-center">السعر</th>
-                                  <th class="text-xs text-secondary text-center">الإجمالي</th>
+                                  <th class="text-xs text-secondary text-center">الإجمالي بالكيلو</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -355,9 +386,8 @@
                                       @endif
                                     </td>
                                     <td class="text-xs text-center">{{ number_format($item->qty, 3) }}</td>
-                                    <td class="text-xs text-center"><span class="">{{ $item->unit }}</span></td>
-                                    <td class="text-xs text-center">{{ number_format($item->price, 2) }} ج.م</td>
-                                    <td class="text-xs text-center font-weight-bold">{{ number_format($item->subtotal, 2) }} ج.م</td>
+                                     <td class="text-xs text-center"><span class="">{{ $item->unit }}</span></td>
+                                    <td class="text-xs text-center font-weight-bold text-primary">{{ number_format($item->total_kg, 3) }} كيلو</td>
                                   </tr>
                                 @endforeach
                               </tbody>
@@ -409,7 +439,7 @@
         const itemsBody = document.getElementById('invoice-items-body');
         const addItemBtn = document.getElementById('add-item-row-btn');
         const totalQtySpan = document.getElementById('total-qty');
-        const grandTotalSpan = document.getElementById('grand-total');
+        const grandTotalKgSpan = document.getElementById('grand-total-kg');
         let rowCounter = 0;
 
         // Function to add a new row
@@ -419,10 +449,10 @@
           const type = data.type || '';
           const fabricColor = data.fabric_color || '';
           const qty = data.qty !== undefined ? data.qty : '';
-          const unit = data.unit || 'كيلو';
-          const price = data.price !== undefined ? data.price : '';
+          const unit = data.unit || 'توب';
+          const totalKg = data.total_kg !== undefined ? data.total_kg : '';
 
-          const units = ['كيلو', 'متر', 'قطعة'];
+          const units = ['توب', 'متر', 'كيلو'];
           let unitRadios = '';
           units.forEach(u => {
             const checked = (u === unit) ? 'checked' : '';
@@ -467,12 +497,9 @@
                       </div>
                   </td>
                   <td>
-                      <input type="number" name="items[${idx}][price]"
-                             class="form-control form-control-sm text-center item-price"
-                             value="${price}" min="0" step="0.01" placeholder="0.00" required>
-                  </td>
-                  <td class="text-center align-middle">
-                      <span class="text-sm font-weight-bold text-dark item-total">0.00</span> ج.م
+                      <input type="number" name="items[${idx}][total_kg]"
+                             class="form-control form-control-sm text-center item-total-kg"
+                             value="${totalKg}" min="0" step="0.001" placeholder="0.000" required>
                   </td>
                   <td class="text-center align-middle">
                       <button type="button" class="btn btn-link text-danger  px-3 mb-0 remove-row-btn">
@@ -499,11 +526,11 @@
           });
 
           const qtyInput = tr.querySelector('.item-qty');
-          const priceInput = tr.querySelector('.item-price');
+          const totalKgInput = tr.querySelector('.item-total-kg');
           const removeBtn = tr.querySelector('.remove-row-btn');
 
           qtyInput.addEventListener('input', calculateTotals);
-          priceInput.addEventListener('input', calculateTotals);
+          totalKgInput.addEventListener('input', calculateTotals);
           removeBtn.addEventListener('click', function () {
             tr.remove();
             renumberRows();
@@ -535,20 +562,18 @@
         function calculateTotals() {
           const rows = itemsBody.querySelectorAll('.item-row');
           let totalQty = 0;
-          let grandTotal = 0;
+          let grandTotalKg = 0;
 
           rows.forEach(row => {
             const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
-            const price = parseFloat(row.querySelector('.item-price').value) || 0;
-            const total = qty * price;
+            const kg = parseFloat(row.querySelector('.item-total-kg').value) || 0;
 
-            row.querySelector('.item-total').textContent = total.toFixed(2);
             totalQty += qty;
-            grandTotal += total;
+            grandTotalKg += kg;
           });
 
           totalQtySpan.textContent = totalQty.toFixed(3);
-          grandTotalSpan.textContent = grandTotal.toFixed(2);
+          grandTotalKgSpan.textContent = grandTotalKg.toFixed(3);
         }
 
         // Restore old input on validation failure
@@ -558,9 +583,9 @@
               code: "{{ addslashes($oldItem['code'] ?? '') }}",
               type: "{{ addslashes($oldItem['type'] ?? '') }}",
               fabric_color: "{{ addslashes($oldItem['fabric_color'] ?? '') }}",
-              qty:          {{ $oldItem['qty'] ?? '' }},
-              unit: "{{ $oldItem['unit'] ?? 'قطعة' }}",
-              price:        {{ $oldItem['price'] ?? 0 }},
+              qty:      {{ $oldItem['qty'] ?? '' }},
+              unit: "{{ $oldItem['unit'] ?? 'كيلو' }}",
+              total_kg: {{ $oldItem['total_kg'] ?? 0 }},
             });
           @endforeach
         @else
@@ -582,6 +607,110 @@
           }
         });
       });
+    </script>
+
+    {{-- ===== Image Compression Script ===== --}}
+    <div id="previewModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.82);align-items:center;justify-content:center;" onclick="closePreviewModal()">
+      <div style="position:relative;" onclick="event.stopPropagation()">
+        <button onclick="closePreviewModal()" style="position:absolute;top:-13px;right:-13px;width:30px;height:30px;border-radius:50%;background:#fff;border:none;font-size:17px;line-height:1;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);">&times;</button>
+        <img id="previewModalImg" src="" style="max-width:90vw;max-height:88vh;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.5);display:block;">
+      </div>
+    </div>
+
+    <script>
+      let originalFile = null;
+      let compressedBlob = null;
+
+      function openPreviewModal() {
+        if (!compressedBlob) return;
+        document.getElementById('previewModalImg').src = URL.createObjectURL(compressedBlob);
+        document.getElementById('previewModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+      function closePreviewModal() {
+        document.getElementById('previewModal').style.display = 'none';
+        document.body.style.overflow = '';
+      }
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') closePreviewModal(); });
+
+      function handleImageSelect(input) {
+        const file = input.files[0];
+        if (!file) return;
+        originalFile = file;
+        document.getElementById('qualityRow').classList.remove('d-none');
+        document.getElementById('imgPreviewBox').classList.remove('d-none');
+        document.getElementById('sizeOriginal').textContent = formatBytes(file.size);
+        recompress();
+      }
+
+      function updateQualityLabel() {
+        const q = document.getElementById('qualitySlider').value;
+        document.getElementById('qualityLabel').textContent = q + '%';
+      }
+
+      function recompress() {
+        if (!originalFile) return;
+        const quality = parseInt(document.getElementById('qualitySlider').value) / 100;
+        const maxW = 1400; // max width in px
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            // Calculate dimensions
+            let w = img.width, h = img.height;
+            if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+
+            const canvas = document.createElement('canvas');
+            canvas.width  = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+            // Try WebP, fallback to jpeg
+            const mimeType = canvas.toDataURL('image/webp').startsWith('data:image/webp')
+              ? 'image/webp' : 'image/jpeg';
+
+            canvas.toBlob(function(blob) {
+              compressedBlob = blob;
+              const dataUrl = canvas.toDataURL(mimeType, quality);
+
+              // Update hidden input (base64)
+              document.getElementById('img_base64').value = dataUrl;
+
+              // Update preview
+              document.getElementById('imgPreview').src = dataUrl;
+
+              // Stats
+              const saved = originalFile.size - blob.size;
+              const pct   = Math.round((saved / originalFile.size) * 100);
+              document.getElementById('sizeCompressed').textContent = formatBytes(blob.size);
+              document.getElementById('sizeSaved').textContent =
+                saved > 0 ? `${formatBytes(saved)} (${pct}% أصغر)` : 'لا فرق';
+            }, mimeType, quality);
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(originalFile);
+      }
+
+      function removeImage() {
+        originalFile = null;
+        compressedBlob = null;
+        document.getElementById('imgPicker').value = '';
+        document.getElementById('img_base64').value = '';
+        document.getElementById('imgPreview').src = '';
+        document.getElementById('imgPreviewBox').classList.add('d-none');
+        document.getElementById('qualityRow').classList.add('d-none');
+        document.getElementById('sizeOriginal').textContent = '—';
+        document.getElementById('sizeCompressed').textContent = '—';
+        document.getElementById('sizeSaved').textContent = '—';
+      }
+
+      function formatBytes(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+      }
     </script>
 
     <footer class="footer pt-3">
