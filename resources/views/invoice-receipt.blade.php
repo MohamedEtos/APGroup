@@ -5,8 +5,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="icon" type="image/png" href="{{ asset('assets/img/favicon.png') }}">
-  <title>فاتورة رقم {{ $invoice->invoice }} - ApGroup</title>
-  
+  <title>فاتورة رقم {{ $invoice->invoice_number }} - ApGroup</title>
+
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
   <style>
@@ -20,7 +20,7 @@
     }
 
     .invoice-card {
-      max-width: 800px;
+      max-width: 860px;
       margin: 0 auto;
       background: #ffffff;
       padding: 40px;
@@ -83,20 +83,41 @@
       font-weight: 700;
       text-align: right;
       padding: 12px 15px;
-      font-size: 14px;
+      font-size: 13px;
       border-bottom: 2px solid #dee2e6;
     }
 
     .invoice-table td {
-      padding: 15px;
-      font-size: 14px;
+      padding: 12px 15px;
+      font-size: 13px;
       color: #525f7f;
       border-bottom: 1px solid #e9ecef;
       text-align: right;
     }
 
+    .color-dot {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid #ccc;
+      vertical-align: middle;
+      margin-left: 5px;
+    }
+
+    .unit-badge {
+      display: inline-block;
+      background: #e8f4fd;
+      color: #1a73e8;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      border: 1px solid #c3e0f9;
+    }
+
     .totals-box {
-      width: 250px;
+      width: 260px;
       margin-right: auto;
       margin-left: 0;
       border-top: 2px solid #dee2e6;
@@ -130,7 +151,7 @@
     }
 
     .actions-bar {
-      max-width: 800px;
+      max-width: 860px;
       margin: 0 auto 20px auto;
       display: flex;
       justify-content: space-between;
@@ -218,7 +239,7 @@
       </div>
       <div>
         <h1 class="invoice-title">فاتورة كتابية</h1>
-        <p style="margin: 4px 0 0 0; font-size: 13px; color: #8898aa; text-align: left;">رقم: {{ $invoice->invoice }}</p>
+        <p style="margin: 4px 0 0 0; font-size: 13px; color: #8898aa; text-align: left;">رقم: {{ $invoice->invoice_number }}</p>
       </div>
     </div>
 
@@ -237,51 +258,47 @@
     </div>
 
     @php
-      $subtotal = 0;
-      $hasItems = $invoice->items && is_array($invoice->items);
-      if ($hasItems) {
-          foreach ($invoice->items as $item) {
-              $subtotal += ($item['qty'] ?? 0) * ($item['price'] ?? 0);
-          }
-      } else {
-          $subtotal = $invoice->qty * $invoice->price;
-      }
+      $subtotal = $invoice->items->sum(fn($i) => $i->qty * $i->price);
     @endphp
 
-    {{-- Table --}}
+    {{-- Items Table --}}
     <table class="invoice-table">
       <thead>
         <tr>
           <th style="width: 5%;">#</th>
           <th>كود التوب</th>
           <th style="text-align: center;">النوع</th>
+          <th style="text-align: center;">لون القماش</th>
           <th style="text-align: center;">الكمية</th>
+          <th style="text-align: center;">الوحدة</th>
           <th style="text-align: left;">سعر الوحدة</th>
           <th style="text-align: left;">الإجمالي</th>
         </tr>
       </thead>
       <tbody>
-        @if($hasItems)
-          @foreach($invoice->items as $index => $item)
-            <tr>
-              <td>{{ $index + 1 }}</td>
-              <td>{{ $item['code'] ?? '' }}</td>
-              <td style="text-align: center;">{{ $item['type'] ?? '' }}</td>
-              <td style="text-align: center;">{{ $item['qty'] ?? 0 }}</td>
-              <td style="text-align: left;">{{ number_format($item['price'] ?? 0, 2) }} ج.م</td>
-              <td style="text-align: left; font-weight: 700; color: #2b3553;">{{ number_format(($item['qty'] ?? 0) * ($item['price'] ?? 0), 2) }} ج.م</td>
-            </tr>
-          @endforeach
-        @else
+        @forelse($invoice->items as $index => $item)
           <tr>
-            <td>1</td>
-            <td>{{ $invoice->code }}</td>
-            <td style="text-align: center;">{{ $invoice->type }}</td>
-            <td style="text-align: center;">{{ $invoice->qty }}</td>
-            <td style="text-align: left;">{{ number_format($invoice->price, 2) }} ج.م</td>
-            <td style="text-align: left; font-weight: 700; color: #2b3553;">{{ number_format($invoice->qty * $invoice->price, 2) }} ج.م</td>
+            <td>{{ $index + 1 }}</td>
+            <td><strong>{{ $item->code }}</strong></td>
+            <td style="text-align: center;">{{ $item->type }}</td>
+            <td style="text-align: center;">
+              @if($item->fabric_color)
+                <span class="color-dot" style="background: {{ $item->fabric_color }};"></span>
+                {{ $item->fabric_color }}
+              @else
+                <span style="color:#ccc;">—</span>
+              @endif
+            </td>
+            <td style="text-align: center;">{{ number_format($item->qty, 3) }}</td>
+            <td style="text-align: center;"><span class="unit-badge">{{ $item->unit }}</span></td>
+            <td style="text-align: left;">{{ number_format($item->price, 2) }} ج.م</td>
+            <td style="text-align: left; font-weight: 700; color: #2b3553;">{{ number_format($item->qty * $item->price, 2) }} ج.م</td>
           </tr>
-        @endif
+        @empty
+          <tr>
+            <td colspan="8" style="text-align: center; color: #aaa;">لا توجد أصناف في هذه الفاتورة.</td>
+          </tr>
+        @endforelse
       </tbody>
     </table>
 

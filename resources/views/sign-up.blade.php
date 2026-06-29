@@ -1297,7 +1297,7 @@
                 </p>
               </div>
             </div>
-            <div class="card-body">
+            <div class="card-body" style="z-index: 2; !important">
               <form role="form text-left">
                 <div class="mb-3">
                   <input type="text" class="form-control" placeholder="Name" aria-label="Name" aria-describedby="email-addon">
