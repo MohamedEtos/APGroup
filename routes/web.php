@@ -14,6 +14,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/office-invoices', [OfficeInvoiceController::class, 'index'])->name('office-invoices.index');
     Route::post('/office-invoices', [OfficeInvoiceController::class, 'store'])->name('office-invoices.store');
+    Route::get('/office-invoices/{id}/edit', [OfficeInvoiceController::class, 'edit'])->name('office-invoices.edit');
+    Route::put('/office-invoices/{id}', [OfficeInvoiceController::class, 'update'])->name('office-invoices.update');
     Route::get('/invoice-receipt/{id}', [OfficeInvoiceController::class, 'showInvoice'])->name('invoice-receipt.show');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

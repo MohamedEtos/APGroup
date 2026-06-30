@@ -73,7 +73,7 @@
                 </g>
               </svg>
             </div>
-            <span class="nav-link-text me-1">إضافة فاتورة مكتب</span>
+            <span class="nav-link-text me-1">انشاء فاتوره</span>
           </a>
         </li>
         <li class="nav-item">

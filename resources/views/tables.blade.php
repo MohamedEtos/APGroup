@@ -280,6 +280,9 @@ function renderTable() {
           <td class="text-center"><span class="text-xs font-weight-bold text-primary">${parseFloat(r.total_kg).toFixed(3)} كيلو</span></td>
           <td class="text-center"><span class="text-xs text-secondary font-weight-bold">${r.date}</span></td>
           <td class="text-center" onclick="event.stopPropagation()">
+            <a href="/office-invoices/${r.id}/edit" class="btn btn-sm btn-outline-warning mb-0 py-1 px-2 me-1" title="تعديل">
+              <i class="fas fa-pencil-alt fa-xs"></i>
+            </a>
             <a href="/invoice-receipt/${r.id}" target="_blank" class="btn btn-sm btn-outline-info mb-0 py-1 px-2" title="عرض / طباعة">
               <i class="fas fa-print fa-xs"></i>
             </a>
