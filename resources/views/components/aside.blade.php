@@ -77,6 +77,26 @@
           </a>
         </li>
         <li class="nav-item">
+          <a class="nav-link {{ request()->is('receive-invoices*') ? 'active' : '' }}" href="{{ route('receive-invoices.index') }}">
+            <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center ms-2 d-flex align-items-center justify-content-center">
+              <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <title>box-3d</title>
+                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                  <g transform="translate(-2319.000000, -291.000000)" fill="#FFFFFF" fill-rule="nonzero">
+                    <g transform="translate(1716.000000, 291.000000)">
+                      <g transform="translate(603.000000, 0.000000)">
+                        <path class="color-background" d="M22.7597105,1.14331169 L40.4256242,11.5200609 C41.3922665,12.087798 42,13.1116581 42,14.222374 L42,35.0766301 C42,37.1328324 40.3301022,38.7987891 38.270034,38.7987891 L21.2740262,38.7987891 L21.2740262,22.1069785 L32.9090909,15.3582455 L32.9090909,10.601953 L20.313463,17.810583 L20.313463,1.19305401 C21.1540058,1.14331169 22.0116867,1.14331169 22.7597105,1.14331169 Z"></path>
+                        <path class="color-background opacity-6" d="M1.27402625,11.5200609 L18.94001,1.14331169 C19.6880337,1.14331169 20.5457147,1.14331169 21.3862575,1.19305401 L21.3862575,17.810583 L8.7905587,10.601953 L8.7905587,15.3582455 L20.4256233,22.1069785 L20.4256233,38.7987891 L3.42995514,38.7987891 C1.36988701,38.7987891 0,37.1328324 0,35.0766301 L0,14.222374 C0,13.1116581 0.607733486,12.087798 1.27402625,11.5200609 Z"></path>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+              </svg>
+            </div>
+            <span class="nav-link-text me-1">استلام الفواتير</span>
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link " href="../pages/billing.html">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center ms-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 43 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">

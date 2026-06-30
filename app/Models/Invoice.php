@@ -14,6 +14,7 @@ class Invoice extends Model
         'sender',
         'img',
         'date',
+        'status',
     ];
 
     /**

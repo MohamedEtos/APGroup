@@ -16,6 +16,8 @@ class InvoiceItem extends Model
         'qty',
         'unit',
         'total_kg',
+        'delivered_qty',
+        'delivered_total_kg',
     ];
 
     /**

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TablesController;
 use App\Http\Controllers\OfficeInvoiceController;
+use App\Http\Controllers\ReceiveInvoiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function () {
@@ -17,6 +18,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/office-invoices/{id}/edit', [OfficeInvoiceController::class, 'edit'])->name('office-invoices.edit');
     Route::put('/office-invoices/{id}', [OfficeInvoiceController::class, 'update'])->name('office-invoices.update');
     Route::get('/invoice-receipt/{id}', [OfficeInvoiceController::class, 'showInvoice'])->name('invoice-receipt.show');
+
+    Route::get('/receive-invoices', [ReceiveInvoiceController::class, 'index'])->name('receive-invoices.index');
+    Route::get('/receive-invoices/{id}', [ReceiveInvoiceController::class, 'show'])->name('receive-invoices.show');
+    Route::put('/receive-invoices/{id}', [ReceiveInvoiceController::class, 'update'])->name('receive-invoices.update');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
