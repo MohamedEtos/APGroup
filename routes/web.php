@@ -4,9 +4,20 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TablesController;
 use App\Http\Controllers\OfficeInvoiceController;
 use App\Http\Controllers\ReceiveInvoiceController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function () {
+    // User & Role Management
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+        Route::post('/users', [UserController::class, 'store'])->name('users.store');
+        Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+        Route::post('/roles/{id}/permissions', [UserController::class, 'updateRolePermissions'])->name('roles.permissions.update');
+    });
     Route::get('/', function () {
         return view('dashboard');
     })->name('dashboard');

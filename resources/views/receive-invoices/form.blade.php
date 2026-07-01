@@ -20,61 +20,7 @@
       </div>
     @endif
 
-    <style>
-      .comparative-card {
-        border-radius: 16px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-        border: 1px solid rgba(0, 0, 0, 0.05);
-        background: #ffffff;
-      }
-
-      .original-section {
-        background-color: #f8f9fa;
-      }
-
-      .delivery-table input {
-        border: 1px solid #d2d6da;
-        box-shadow: none;
-        border-radius: 8px;
-        padding: 0.4rem 0.6rem;
-        transition: all 0.2s ease-in-out;
-        font-size: 0.85rem;
-      }
-
-      .delivery-table input:focus {
-        border-color: #cb0c9f;
-        box-shadow: 0 0 0 2px rgba(203, 12, 159, 0.15);
-        outline: none;
-        background-color: #fff;
-      }
-
-      /* Discrepancy styles */
-      .discrepancy-warning {
-        border-color: #fd7e14 !important;
-        background-color: #fff3cd !important;
-        color: #856404 !important;
-      }
-
-      .discrepancy-label {
-        font-size: 0.7rem;
-        color: #fd7e14;
-        font-weight: bold;
-        display: none;
-      }
-
-      .discrepancy-label.show {
-        display: block;
-      }
-
-      .img-preview-receipt {
-        width: 60px;
-        height: 60px;
-        object-fit: cover;
-        border-radius: 8px;
-        border: 1px solid #dee2e6;
-        cursor: pointer;
-      }
-    </style>
+    @vite('resources/css/sections/receive-invoices-form.css')
 
     <div class="row">
       

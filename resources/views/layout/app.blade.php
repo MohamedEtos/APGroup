@@ -13,17 +13,21 @@
   <!--     Fonts and icons     -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
   <style>
-    *, *::before, *::after, body, html {
+    *,
+    *::before,
+    *::after,
+    body,
+    html {
       font-family: 'Alexandria', 'Open Sans', sans-serif !important;
     }
   </style>
   <!-- Font Awesome Icons -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+<script src="https://kit.fontawesome.com/9a4cf689a5.js" crossorigin="anonymous"></script>
   <!-- CSS Files -->
   @vite([
-    'resources/assets/css/nucleo-icons.css',
-    'resources/assets/css/nucleo-svg.css',
-    'resources/assets/css/soft-ui-dashboard.css',
+  'resources/assets/css/nucleo-icons.css',
+  'resources/assets/css/nucleo-svg.css',
+  'resources/assets/css/soft-ui-dashboard.css',
    ])
 </head>
 

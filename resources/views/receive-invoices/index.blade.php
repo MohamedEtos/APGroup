@@ -12,63 +12,7 @@
   </div>
 </div>
 
-<style>
-  #imgModal.open { display:flex !important; }
-
-  .img-thumb {
-    width: 38px; height: 38px;
-    object-fit: cover;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,.15);
-    cursor: zoom-in;
-    transition: transform .18s ease, box-shadow .18s ease;
-    border: 2px solid #e9ecef;
-  }
-  .img-thumb:hover { transform: scale(1.14); box-shadow: 0 4px 14px rgba(0,0,0,.22); }
-
-  .img-placeholder {
-    width: 38px; height: 38px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
-    display: inline-flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    border: 2px dashed #ccc;
-    color: #bbb;
-    font-size: 15px;
-    transition: all .18s ease;
-  }
-  .img-placeholder:hover { border-color: #cb0c9f; color: #cb0c9f; transform: scale(1.1); }
-
-  /* Expandable items row */
-  .invoice-detail-row { display: none; background: #f8f9fa; }
-  .invoice-detail-row.open { display: table-row; }
-
-  tr.invoice-main-row { cursor: pointer; user-select: none; }
-  tr.invoice-main-row:hover td { background-color: rgba(203,12,159,.04); }
-
-  .toggle-chevron {
-    display: inline-block;
-    transition: transform .22s ease;
-    font-size: 0.65rem;
-    color: #8392ab;
-    margin-left: 5px;
-  }
-  .toggle-chevron.open { transform: rotate(90deg); }
-
-  .detail-inner-table th {
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    letter-spacing: .4px;
-    color: #8392ab;
-    padding: 6px 10px;
-  }
-  .detail-inner-table td {
-    font-size: 0.8rem;
-    padding: 7px 10px;
-    border-bottom: 1px solid #ececec;
-  }
-  .detail-inner-table tr:last-child td { border-bottom: none; }
-</style>
+@vite('resources/css/sections/tables.css')
 
 <div class="container-fluid py-4">
   
@@ -214,8 +158,8 @@ function buildItemsTable(items) {
 function renderTable() {
   const tbody = document.getElementById('tableBody');
   if (filteredData.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10" class="text-center py-5 text-secondary">
-      <i class="fas fa-check-double fa-2x mb-2 d-block text-success opacity-8"></i>
+    tbody.innerHTML = `<tr><td colspan="10" class="text-center justify-content-center py-5 text-secondary">
+      <i class="fas fa-check-double fa-2x mb-2 d-block mx-auto text-success opacity-8"></i>
       جميع الطلبات والفواتير مستلمة بالكامل!<br>
       <span class="text-xs text-muted">لا توجد فواتير قيد الاستلام حالياً.</span>
     </td></tr>`;
