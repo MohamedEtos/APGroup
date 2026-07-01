@@ -172,7 +172,7 @@
             <div class="d-flex justify-content-between align-items-center">
               <div>
                 <h6 class="mb-0">إنشاء فاتورة مكتب جديدة</h6>
-                <p class="text-xs text-secondary mb-0">أدخل تفاصيل الفاتورة وأضف الأصناف مع العدد والإجمالي بالكيلو</p>
+                <p class="text-xs text-secondary mb-0">أدخل تفاصيل الفاتورة وأضف الأصناف مع العدد والإجمالي </p>
               </div>
               <div class="logo-container align-self-start">
                 <span class="font-weight-bold">ApGroup المكتب الرئيسي</span>

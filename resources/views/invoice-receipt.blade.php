@@ -198,6 +198,40 @@
       border-color: #cbd5e0;
     }
 
+    .toggle-container {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .btn-toggle {
+      border: 1px solid #dee2e6;
+      background-color: #fff;
+      color: #525f7f;
+      padding: 8px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 30px;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-toggle:hover {
+      background-color: #f8f9fa;
+      border-color: #cbd5e0;
+    }
+
+    .btn-toggle.active {
+      background-color: #5e72e4;
+      color: #fff;
+      border-color: #5e72e4;
+      box-shadow: 0 4px 6px rgba(50,50,93,0.11), 0 1px 3px rgba(0,0,0,0.08);
+    }
+
     /* Print Stylesheet */
     @media print {
       body {
@@ -213,7 +247,7 @@
         margin: 0;
       }
 
-      .actions-bar {
+      .actions-bar, .toggle-container {
         display: none !important;
       }
     }
@@ -238,7 +272,7 @@
         <img src="{{ asset('assets/img/logos/ap.svg') }}" alt="ApGroup Logo">
       </div>
       <div>
-        <h1 class="invoice-title">فاتورة كتابية</h1>
+        <h1 class="invoice-title">AP Group </h1>
         <p style="margin: 4px 0 0 0; font-size: 13px; color: #8898aa; text-align: left;">رقم: {{ $invoice->invoice_number }}</p>
       </div>
     </div>
@@ -256,6 +290,18 @@
         <p><strong>المسؤول (المسلم):</strong> {{ $invoice->sender }}</p>
       </div>
     </div>
+
+    {{-- View Toggle Buttons --}}
+    @if($invoice->status === 'received')
+    <div class="toggle-container">
+      <button type="button" id="btn-original" class="btn-toggle active" onclick="setView('original')">
+        <i class="fas fa-file-invoice"></i> القيمة الأصلية المطلوبة
+      </button>
+      <button type="button" id="btn-delivered" class="btn-toggle" onclick="setView('delivered')">
+        <i class="fas fa-clipboard-check"></i> القيمة المسلمة فعلياً
+      </button>
+    </div>
+    @endif
 
     {{-- Items Table --}}
     <table class="invoice-table">
@@ -284,9 +330,9 @@
                 <span style="color:#ccc;">—</span>
               @endif
             </td>
-            <td style="text-align: center;">{{ number_format($item->qty, 3) }}</td>
+            <td style="text-align: center;" class="item-qty" data-original="{{ number_format($item->qty, 3) }}" data-delivered="{{ number_format($item->delivered_qty ?? 0, 3) }}">{{ number_format($item->qty, 3) }}</td>
             <td style="text-align: center;"><span class="unit-badge">{{ $item->unit }}</span></td>
-            <td style="text-align: center; font-weight: 700; color: #2b3553;">{{ number_format($item->total_kg, 3) }} كيلو</td>
+            <td style="text-align: center; font-weight: 700; color: #2b3553;" class="item-weight" data-original="{{ number_format($item->total_kg, 3) }} كيلو" data-delivered="{{ number_format($item->delivered_total_kg ?? 0, 3) }} كيلو">{{ number_format($item->total_kg, 3) }} كيلو</td>
           </tr>
         @empty
           <tr>
@@ -300,7 +346,7 @@
     <div class="totals-box">
       <div class="total-row grand-total">
         <span>إجمالي الكيلو:</span>
-        <span>{{ number_format($invoice->items->sum('total_kg'), 3) }} كيلو</span>
+        <span id="grand-total" data-original="{{ number_format($invoice->items->sum('total_kg'), 3) }} كيلو" data-delivered="{{ number_format($invoice->items->sum('delivered_total_kg'), 3) }} كيلو">{{ number_format($invoice->items->sum('total_kg'), 3) }} كيلو</span>
       </div>
     </div>
 
@@ -322,6 +368,26 @@
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  @if($invoice->status === 'received')
+  <script>
+    function setView(type) {
+      document.getElementById('btn-original').classList.toggle('active', type === 'original');
+      document.getElementById('btn-delivered').classList.toggle('active', type === 'delivered');
+
+      document.querySelectorAll('.item-qty').forEach(function(el) {
+        el.textContent = type === 'original' ? el.getAttribute('data-original') : el.getAttribute('data-delivered');
+      });
+
+      document.querySelectorAll('.item-weight').forEach(function(el) {
+        el.textContent = type === 'original' ? el.getAttribute('data-original') : el.getAttribute('data-delivered');
+      });
+
+      var totalEl = document.getElementById('grand-total');
+      totalEl.textContent = type === 'original' ? totalEl.getAttribute('data-original') : totalEl.getAttribute('data-delivered');
+    }
+  </script>
+  @endif
 </body>
 
 </html>
