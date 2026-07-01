@@ -32,11 +32,11 @@
                 @enderror
               </div>
 
-              {{-- Email --}}
+              {{-- Username --}}
               <div class="col-md-6 col-12 mb-3">
-                <label for="email" class="form-label text-xs font-weight-bold text-secondary">البريد الإلكتروني</label>
-                <input type="email" class="form-control form-control-sm @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" required placeholder="name@example.com">
-                @error('email')
+                <label for="username" class="form-label text-xs font-weight-bold text-secondary">اسم المستخدم</label>
+                <input type="text" class="form-control form-control-sm @error('username') is-invalid @enderror" id="username" name="username" value="{{ old('username') }}" required placeholder="اسم المستخدم">
+                @error('username')
                   <div class="invalid-feedback text-xs">{{ $message }}</div>
                 @enderror
               </div>

@@ -61,7 +61,7 @@
               <thead>
                 <tr>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-3">المستخدم</th>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">البريد الإلكتروني</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">اسم المستخدم</th>
                   <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">الدور المخصص</th>
                   <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">تاريخ التسجيل</th>
                   <th class="text-secondary opacity-7"></th>
@@ -84,7 +84,7 @@
                       </div>
                     </td>
                     <td>
-                      <p class="text-xs font-weight-bold mb-0">{{ $user->email }}</p>
+                      <p class="text-xs font-weight-bold mb-0">{{ $user->username }}</p>
                     </td>
                     <td class="align-middle text-center text-sm">
                       @forelse($user->roles as $role)

@@ -39,15 +39,14 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'username' => 'required|string|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,name',
         ], [
             'name.required' => 'الاسم مطلوب.',
-            'email.required' => 'البريد الإلكتروني مطلوب.',
-            'email.email' => 'صيغة البريد الإلكتروني غير صحيحة.',
-            'email.unique' => 'البريد الإلكتروني مسجل بالفعل.',
+            'username.required' => 'اسم المستخدم مطلوب.',
+            'username.unique' => 'اسم المستخدم مسجل بالفعل.',
             'password.required' => 'كلمة المرور مطلوبة.',
             'password.min' => 'يجب ألا تقل كلمة المرور عن 8 أحرف.',
             'password.confirmed' => 'تأكيد كلمة المرور غير متطابق.',
@@ -55,7 +54,7 @@ class UserController extends Controller
 
         $user = User::create([
             'name' => $request->name,
-            'email' => $request->email,
+            'username' => $request->username,
             'password' => Hash::make($request->password),
         ]);
 
@@ -85,10 +84,9 @@ class UserController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => [
+            'username' => [
                 'required',
                 'string',
-                'email',
                 'max:255',
                 Rule::unique('users')->ignore($user->id),
             ],
@@ -97,15 +95,14 @@ class UserController extends Controller
             'roles.*' => 'exists:roles,name',
         ], [
             'name.required' => 'الاسم مطلوب.',
-            'email.required' => 'البريد الإلكتروني مطلوب.',
-            'email.email' => 'صيغة البريد الإلكتروني غير صحيحة.',
-            'email.unique' => 'البريد الإلكتروني مسجل بالفعل.',
+            'username.required' => 'اسم المستخدم مطلوب.',
+            'username.unique' => 'اسم المستخدم مسجل بالفعل.',
             'password.min' => 'يجب ألا تقل كلمة المرور عن 8 أحرف.',
             'password.confirmed' => 'تأكيد كلمة المرور غير متطابق.',
         ]);
 
         $user->name = $request->name;
-        $user->email = $request->email;
+        $user->username = $request->username;
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);

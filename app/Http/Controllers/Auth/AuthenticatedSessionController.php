@@ -28,7 +28,18 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $user = auth()->user();
+        $fallback = route('dashboard');
+
+        if ($user->hasAnyRole(['admin', 'manager'])) {
+            $fallback = route('dashboard');
+        } elseif ($user->hasRole('office') || $user->can('create invoices')) {
+            $fallback = route('office-invoices.index');
+        } elseif ($user->hasRole('store') || $user->hasRole('employee') || $user->can('receive invoices')) {
+            $fallback = route('receive-invoices.index');
+        }
+
+        return redirect()->intended($fallback);
     }
 
     /**

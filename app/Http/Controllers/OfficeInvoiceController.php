@@ -225,4 +225,25 @@ class OfficeInvoiceController extends Controller
 
         return redirect()->route('tables')->with('success', 'تم تعديل الفاتورة بنجاح!');
     }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy($id)
+    {
+        $invoice = Invoice::findOrFail($id);
+
+        // Delete invoice image if exists and not default
+        if ($invoice->img && $invoice->img !== 'assets/img/team-2.jpg') {
+            $oldPath = public_path($invoice->img);
+            if (file_exists($oldPath)) {
+                @unlink($oldPath);
+            }
+        }
+
+        $invoice->items()->delete();
+        $invoice->delete();
+
+        return redirect()->route('tables')->with('success', 'تم حذف الفاتورة بنجاح!');
+    }
 }

@@ -23,6 +23,8 @@ class RoleAndPermissionSeeder extends Seeder
         $permissions = [
             'manage users',
             'create invoices',
+            'edit invoices',
+            'delete invoices',
             'receive invoices',
             'view reports',
         ];
@@ -38,6 +40,7 @@ class RoleAndPermissionSeeder extends Seeder
         $managerRole = Role::findOrCreate('manager', 'web');
         $managerRole->givePermissionTo([
             'create invoices',
+            'edit invoices',
             'receive invoices',
             'view reports',
         ]);
@@ -45,6 +48,22 @@ class RoleAndPermissionSeeder extends Seeder
         $employeeRole = Role::findOrCreate('employee', 'web');
         $employeeRole->givePermissionTo([
             'receive invoices',
+        ]);
+
+        // New Role: office (المكتب)
+        $officeRole = Role::findOrCreate('office', 'web');
+        $officeRole->givePermissionTo([
+            'create invoices',
+            'edit invoices',
+            'delete invoices',
+            'view reports',
+        ]);
+
+        // New Role: store (المخزن)
+        $storeRole = Role::findOrCreate('store', 'web');
+        $storeRole->givePermissionTo([
+            'receive invoices',
+            'view reports',
         ]);
 
         // Create default admin if not exists

@@ -35,9 +35,11 @@
               <option value="all">الكل</option>
             </select>
             <input type="text" id="liveSearchInput" class="form-control form-control-sm" style="width:160px;" placeholder="بحث..." oninput="filterTable()">
+            @can('create invoices')
             <a href="{{ route('office-invoices.index') }}" class="btn btn-sm bg-gradient-primary mb-0 text-nowrap">
               <i class="fas fa-plus me-1"></i> فاتورة جديدة
             </a>
+            @endcan
           </div>
         </div>
 
@@ -51,8 +53,8 @@
                   <th class="font-weight-bolder text-end pe-3">#</th>
                   <th class="font-weight-bolder text-end pe-3">رقم الفاتورة</th>
                   <th class="font-weight-bolder text-center">صورة</th>
-                  <th class="font-weight-bolder text-end pe-3">المسلم</th>
-                  <th class="font-weight-bolder text-end pe-3">المستلم</th>
+                  <th class="font-weight-bolder text-end pe-3">الموظف</th>
+                  <th class="font-weight-bolder text-end pe-3">العميل</th>
                   <th class="font-weight-bolder text-center">إجمالي العدد</th>
                   <th class="font-weight-bolder text-center">إجمالي الكيلو</th>
                   <th class="font-weight-bolder text-center">التاريخ</th>
@@ -95,6 +97,9 @@
 </div>
 
 <script>
+const canCreate = @json(auth()->user()->can('create invoices'));
+const canEdit   = @json(auth()->user()->can('edit invoices'));
+const canDelete = @json(auth()->user()->can('delete invoices'));
 const allData = @json($invoices);
 
 const PLACEHOLDER_SVG = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect width='80' height='80' rx='10' fill='%23f0f0f0'/><text x='50%25' y='52%25' dominant-baseline='middle' text-anchor='middle' font-size='28' fill='%23bbb'>&#128247;</text></svg>`;
@@ -201,7 +206,7 @@ function renderTable() {
   if (page.length === 0) {
     tbody.innerHTML = `<tr><td colspan="10" class="text-center py-5 text-secondary">
       <i class="fas fa-inbox fa-2x mb-2 d-block mx-auto opacity-4"></i>لا توجد فواتير مسجلة بعد.<br>
-      <a href="{{ route('office-invoices.index') }}" class="btn btn-sm bg-gradient-primary mt-3">إضافة فاتورة</a>
+      ${canCreate ? `<a href="{{ route('office-invoices.index') }}" class="btn btn-sm bg-gradient-primary mt-3">إضافة فاتورة</a>` : ''}
     </td></tr>`;
   } else {
     let html = '';
@@ -224,12 +229,21 @@ function renderTable() {
           <td class="text-center"><span class="text-xs font-weight-bold text-primary">${parseFloat(r.total_kg).toFixed(3)} كيلو</span></td>
           <td class="text-center"><span class="text-xs text-secondary font-weight-bold">${r.date}</span></td>
           <td class="text-center" onclick="event.stopPropagation()">
+            ${canEdit ? `
             <a href="/office-invoices/${r.id}/edit" class="btn btn-sm btn-outline-warning mb-0 py-1 px-2 me-1" title="تعديل">
               <i class="fas fa-pencil-alt fa-xs"></i>
-            </a>
+            </a>` : ''}
             <a href="/invoice-receipt/${r.id}" target="_blank" class="btn btn-sm btn-outline-info mb-0 py-1 px-2" title="عرض / طباعة">
               <i class="fas fa-print fa-xs"></i>
             </a>
+            ${canDelete ? `
+            <form action="/office-invoices/${r.id}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذه الفاتورة؟')">
+              <input type="hidden" name="_token" value="${document.querySelector('meta[name=\"csrf-token\"]').getAttribute('content')}">
+              <input type="hidden" name="_method" value="DELETE">
+              <button type="submit" class="btn btn-sm btn-outline-danger mb-0 py-1 px-2 me-1" title="حذف" style="border: 1px solid #ea0606; color: #ea0606; background: transparent;">
+                <i class="fas fa-trash-alt fa-xs"></i>
+              </button>
+            </form>` : ''}
           </td>
         </tr>
         <tr class="invoice-detail-row" id="detail-${r.id}">

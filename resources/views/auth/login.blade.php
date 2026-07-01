@@ -70,7 +70,7 @@
               <div class="card card-plain mt-8">
                 <div class="card-header pb-0 text-start bg-transparent">
                   <h3 class="font-weight-bolder text-info text-gradient">مرحباً بك مجدداً</h3>
-                  <p class="mb-0 text-secondary text-xs">أدخل بريدك الإلكتروني وكلمة المرور لتسجيل الدخول</p>
+                  <p class="mb-0 text-secondary text-xs">أدخل اسم المستخدم وكلمة المرور لتسجيل الدخول</p>
                 </div>
                 <div class="card-body">
                   
@@ -84,10 +84,10 @@
                   <form role="form" method="POST" action="{{ route('login') }}">
                     @csrf
 
-                    <label class="text-xs font-weight-bold text-secondary">البريد الإلكتروني</label>
+                    <label class="text-xs font-weight-bold text-secondary">اسم المستخدم</label>
                     <div class="mb-3">
-                      <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" placeholder="البريد الإلكتروني" aria-label="Email" required autofocus autocomplete="username">
-                      @error('email')
+                      <input type="text" class="form-control @error('username') is-invalid @enderror" id="username" name="username" value="{{ old('username') }}" placeholder="اسم المستخدم" aria-label="Username" required autofocus autocomplete="username">
+                      @error('username')
                         <div class="text-danger text-xs mt-1">{{ $message }}</div>
                       @enderror
                     </div>

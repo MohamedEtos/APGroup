@@ -74,6 +74,7 @@
 
 <script>
 const allData = @json($invoices);
+const canReceive = @json(auth()->user()->can('receive invoices'));
 const PLACEHOLDER_SVG = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect width='80' height='80' rx='10' fill='%23f0f0f0'/><text x='50%25' y='52%25' dominant-baseline='middle' text-anchor='middle' font-size='28' fill='%23bbb'>&#128247;</text></svg>`;
 
 let filteredData = [...allData];
@@ -185,9 +186,10 @@ function renderTable() {
             <span class="badge badge-sm bg-gradient-warning">قيد الاستلام</span>
           </td>
           <td class="text-center" onclick="event.stopPropagation()">
+            ${canReceive ? `
             <a href="/receive-invoices/${r.id}" class="btn btn-sm bg-gradient-primary mb-0 py-1 px-3" title="بدء الاستلام والمقارنة">
               <i class="fas fa-clipboard-check fa-xs me-1"></i> استلام
-            </a>
+            </a>` : ''}
           </td>
         </tr>
         <tr class="invoice-detail-row" id="detail-${r.id}">
