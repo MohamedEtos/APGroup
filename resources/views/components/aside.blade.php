@@ -152,6 +152,9 @@
             <span class="nav-link-text me-1">تسجيل الدخول</span>
           </a>
         </li>
+        @endguest
+
+        @role('admin')
         <li class="nav-item">
           <a class="nav-link " href="{{ route('register') }}">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center ms-2 d-flex align-items-center justify-content-center">
@@ -171,10 +174,10 @@
                 </g>
               </svg>
             </div>
-            <span class="nav-link-text me-1">اشتراك</span>
+            <span class="nav-link-text me-1">إنشاء مستخدم جديد</span>
           </a>
         </li>
-        @endguest
+        @endrole
 
         @auth
         <li class="nav-item">

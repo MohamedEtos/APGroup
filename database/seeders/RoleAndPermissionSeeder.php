@@ -71,7 +71,7 @@ class RoleAndPermissionSeeder extends Seeder
             ['email' => 'admin@apgroup.com'],
             [
                 'name' => 'مدير النظام',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('8472304'),
             ]
         );
 

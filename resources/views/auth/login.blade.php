@@ -43,11 +43,7 @@
                     الرئيسية
                   </a>
                 </li>
-                <li class="nav-item">
-                  <a class="nav-link me-2" href="{{ route('register') }}">
-                    إنشاء حساب جديد
-                  </a>
-                </li>
+
                 <li class="nav-item">
                   <a class="nav-link me-2" href="{{ route('login') }}">
                     تسجيل الدخول
@@ -100,9 +96,9 @@
                       @enderror
                     </div>
 
-                    <div class="form-check form-switch text-end">
+                    <div class="form-check form-switch text-end" style="direction: ltr !important;">
                       <input class="form-check-input me-auto ms-2" type="checkbox" id="remember_me" name="remember">
-                      <label class="form-check-label text-xs" for="remember_me">تذكرني على هذا الجهاز</label>
+                      <label  class="form-check-label text-xs" for="remember_me">تذكرني على هذا الجهاز</label>
                     </div>
 
                     <div class="text-center">
@@ -110,12 +106,7 @@
                     </div>
                   </form>
                 </div>
-                <div class="card-footer text-center pt-0 px-lg-2 px-1">
-                  <p class="mb-4 text-sm mx-auto">
-                    ليس لديك حساب؟
-                    <a href="{{ route('register') }}" class="text-info text-gradient font-weight-bold">إنشاء حساب جديد</a>
-                  </p>
-                </div>
+
               </div>
             </div>
             <div class="col-md-6">
@@ -134,7 +125,6 @@
       <div class="row">
         <div class="col-8 mx-auto text-center mt-1">
           <p class="mb-0 text-secondary">
-            Copyright © <script>document.write(new Date().getFullYear())</script> Soft by Creative Tim.
           </p>
         </div>
       </div>
